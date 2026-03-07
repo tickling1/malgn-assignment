@@ -1,6 +1,6 @@
 ## Simple CMS REST API Project
 (주)맑은기술 백엔드 과제로 진행된 Simple CMS REST API 프로젝트입니다. 기본적인 요구사항인 콘텐츠 CRUD 및 권한 제어를 구현하였으며, 추가로 QueryDSL을 활용한 동적 검색과 계층형 댓글 시스템을 포함하고 있습니다.
-
+##
 ### 프로젝트 실행 방법
 1. 환경 요구사항
 - Java 25 이상
@@ -20,6 +20,7 @@ cd malgn-assignment
 빌드 및 실행 (Windows)
 gradlew.bat bootRun
 
+##
 ### 구현 내용 및 추가 구현 기능
 1. 콘텐츠 관리 및 권한 제어 (기본 요구사항)
 - Contents CRUD: JPA를 활용하여 게시글의 생성, 수정, 삭제, 상세 조회를 구현했습니다.
@@ -39,15 +40,13 @@ gradlew.bat bootRun
 - Jackson 어노테이션(@JsonPropertyOrder, @JsonInclude)을 활용하여 API 응답 시 게시글은 최신순(내림차순)으로 보여주고,댓글과 대댓글은 대화의 맥락을 유지하기 위해 작성 순서(오름차순)로 배치되도록 하고, 불필요한 필드(답글이 비어있는 경우)는 노출되지 않도록 조정했습니다.
 
 5. 공통 예외 처리 및 응답 구조
-<img width="1512" height="380" alt="image" src="https://github.com/user-attachments/assets/4609a248-2232-47ce-aca5-59b6b329339e" />
 - Global Exception Handler: @RestControllerAdvice를 사용하여 프로젝트 전역에서 발생하는 예외를 공통된 형식으로 응답하도록 구현했습니다.
+<img width="1512" height="380" alt="image" src="https://github.com/user-attachments/assets/4609a248-2232-47ce-aca5-59b6b329339e" />
 
-
-
-AI 도구 활용 명시
+##
+## AI 도구 활용 명시
+Gemini 활용 범위
 - 사용 도구: Gemini 
-
-활용 범위
 - Java 25 및 Spring Boot 4 환경에서의 QueryDSL 설정 및 6.x 버전 문법 확인.
 - 계층형 댓글 구조 구현 시 Stream API를 활용한 DTO 변환 및 정렬 로직 최적화.
 - REST API 응답 시 JSON 필드 순서(@JsonPropertyOrder) 및 빈 값 처리(@JsonInclude) 가이드 참고.
