@@ -23,20 +23,34 @@ public class ContentsController {
     private final ContentsService contentsService;
 
     /**
-     * 1. 콘텐츠 목록 조회 (페이징 & 검색)
+     * 1. 콘텐츠 전체 목록 조회 (단순 페이징)
+     * GET /api/contents?page=0&size=10
      */
     @GetMapping
     public ResponseEntity<Page<ContentResponseDto>> getList(
-            @ModelAttribute ContentSearchCondition condition,
             @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        // 서비스가 이미 Page<ContentResponseDto>를 반환하므로 바로 받습니다.
-        Page<ContentResponseDto> responsePage = contentsService.getContentsList(condition, pageable);
-
+        // 검색 조건 없이 페이징만 수행하는 서비스 호출
+        Page<ContentResponseDto> responsePage = contentsService.getContentsList(pageable);
         return ResponseEntity.ok(responsePage);
     }
+
     /**
-     * 2. 콘텐츠 상세 조회 (조회수 증가 포함)
+     * 2. 콘텐츠 검색 목록 조회 (QueryDSL 동적 검색)
+     * GET /api/contents/search?title=공지&username=admin&startDate=2026-02-07T00:00:00&endDate=2026-03-07T23:59:59&page=0&size=10
+     */
+    @GetMapping("/search") // 👈 경로를 분리하여 중복 매핑 방지
+    public ResponseEntity<Page<ContentResponseDto>> getSearchList(
+            @ModelAttribute ContentSearchCondition condition,
+            @PageableDefault(size = 10) Pageable pageable) {
+
+        // QueryDSL 기반의 동적 검색 서비스 호출
+        Page<ContentResponseDto> result = contentsService.getContentsListWithCond(condition, pageable);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 3. 콘텐츠 상세 조회 (조회수 증가 포함)
      * GET /api/contents/{id}
      */
     @GetMapping("/{id}")
@@ -46,7 +60,7 @@ public class ContentsController {
     }
 
     /**
-     * 3. 콘텐츠 등록
+     * 4. 콘텐츠 등록
      * POST /api/contents
      */
     @PostMapping
@@ -57,7 +71,7 @@ public class ContentsController {
 
 
     /**
-     * 4. 콘텐츠 수정
+     * 5. 콘텐츠 수정
      * PUT /api/contents/{id}
      */
     @PutMapping("/{id}")
@@ -72,7 +86,7 @@ public class ContentsController {
     }
 
     /**
-     * 5. 콘텐츠 삭제
+     * 6. 콘텐츠 삭제
      * DELETE /api/contents/{id}
      */
     @DeleteMapping("/{id}")

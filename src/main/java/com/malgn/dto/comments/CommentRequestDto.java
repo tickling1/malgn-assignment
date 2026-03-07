@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommentRequestDto {
 
-    private Long contentId;    // 댓글이 달릴 게시글 ID (필수)
+    private Long contentId;    // 댓글이 달릴 게시글 ID
     private Long parentId;     // 부모 댓글 ID (대댓글일 경우에만 전달, 일반 댓글이면 null)
     private String content;    // 댓글 내용
 }

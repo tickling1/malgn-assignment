@@ -37,31 +37,26 @@ public class ContentsService {
     }
 
     /**
-     * 2. 콘텐츠 목록 조회 - 페이징 & 검색 포함
+     * 2. 콘텐츠 목록 전체 조회 - 페이징
      */
     @Transactional(readOnly = true)
-    public Page<ContentResponseDto> getContentsList(ContentSearchCondition condition, Pageable pageable) {
-        if (condition.getStartDate() != null && condition.getEndDate() != null) {
-            return contentsRepository.findByCreatedDateBetween(
-                            condition.getStartDate(), condition.getEndDate(), pageable)
-                    .map(ContentResponseDto::from);
-        }
-
-        if (condition.getKeyword() != null && !condition.getKeyword().isBlank()) {
-            if ("username".equals(condition.getType())) {
-                return contentsRepository.findByCreatedByContaining(condition.getKeyword(), pageable)
-                        .map(ContentResponseDto::from);
-            }
-            return contentsRepository.findByTitleContaining(condition.getKeyword(), pageable)
-                    .map(ContentResponseDto::from);
-        }
-
+    public Page<ContentResponseDto> getContentsList(Pageable pageable) {
+        // 검색 조건 없이 단순히 전체 목록을 페이징하여 반환
         return contentsRepository.findAll(pageable)
                 .map(ContentResponseDto::from);
     }
 
     /**
-     * 3. 콘텐츠 상세 조회
+     * 3. 콘텐츠 목록 조회 및 동적 검색 (QueryDSL 적용)
+     */
+    @Transactional(readOnly = true)
+    public Page<ContentResponseDto> getContentsListWithCond(ContentSearchCondition condition, Pageable pageable) {
+        return contentsRepository.searchContents(condition, pageable);
+    }
+
+    /**
+     * 4. 콘텐츠 상세 조회
+     * 증가 값이 있으므로 readOnly 건들지 말 것
      */
     @Transactional
     public ContentDetailResponseDto getContentDetail(Long id) {
@@ -73,7 +68,7 @@ public class ContentsService {
     }
 
     /**
-     * 4. 콘텐츠 수정
+     * 5. 콘텐츠 수정
      */
     @Transactional
     public void updateContent(Long id, ContentRequestDto dto, String currentName, Collection<? extends GrantedAuthority> authorities) {
@@ -86,7 +81,7 @@ public class ContentsService {
     }
 
     /**
-     * 5. 콘텐츠 삭제
+     * 6. 콘텐츠 삭제
      */
     @Transactional
     public void deleteContent(Long id, String currentName, Collection<? extends GrantedAuthority> authorities) {
@@ -98,9 +93,11 @@ public class ContentsService {
         contentsRepository.delete(content);
     }
 
+
     /**
      * 권한 검증 공통 메서드
      */
+    @Transactional(readOnly = true)
     private void validateAuthorOrAdmin(String authorName, String currentName, Collection<? extends GrantedAuthority> authorities) {
         boolean isAdmin = authorities.stream()
                 .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
