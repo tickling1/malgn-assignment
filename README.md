@@ -1,4 +1,4 @@
-## Simple CMS REST API Project
+## 👋 Simple CMS REST API Project
 (주)맑은기술 백엔드 과제로 진행된 Simple CMS REST API 프로젝트입니다. 
 
 기본적인 요구사항인 콘텐츠 CRUD 및 권한 제어를 구현하였으며, 추가로 QueryDSL을 활용한 동적 검색과 계층형 댓글 시스템을 포함하고 있습니다.
