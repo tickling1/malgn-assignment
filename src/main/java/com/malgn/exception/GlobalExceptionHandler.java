@@ -1,39 +1,46 @@
 package com.malgn.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    // 1. 시큐리티 인증 실패 (로그인 시 아이디/비번 틀림)
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException e) {
-        return getResponse("아이디 또는 비밀번호가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED);
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e, HttpServletRequest request) {
+        ErrorCode errorCode = e.getErrorCode();
+        return createErrorResponse(errorCode, e.getMessage(), request);
     }
 
-    // 2. 비즈니스 로직 에러 (수정/삭제 권한 없음 등)
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException e) {
-        return getResponse(e.getMessage(), HttpStatus.FORBIDDEN);
+    // [404] 존재하지 않는 API 경로 (NoHandlerFoundException)
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoHandlerFound(NoHandlerFoundException e, HttpServletRequest request) {
+        return createErrorResponse(ErrorCode.API_NOT_FOUND, ErrorCode.API_NOT_FOUND.getMessage(), request);
     }
 
-    // 3. 데이터 없음 (잘못된 ID로 조회 등)
-    @ExceptionHandler(jakarta.persistence.EntityNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(jakarta.persistence.EntityNotFoundException e) {
-        return getResponse("요청하신 데이터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    // [400] @Valid 검증 실패는 스프링 자체 예외라 따로 관리
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e, HttpServletRequest request) {
+        String message = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        return createErrorResponse(ErrorCode.INVALID_INPUT_VALUE, message, request);
     }
 
-    // 공통 응답 포맷 생성기
-    private ResponseEntity<Map<String, Object>> getResponse(String message, HttpStatus status) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("message", message);
-        body.put("code", status.value());
-        return new ResponseEntity<>(body, status);
+    // 공통 응답 생성 메서드
+    private ResponseEntity<ErrorResponse> createErrorResponse(ErrorCode errorCode, String message, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                errorCode.getStatus().value(),
+                errorCode.getCode(),
+                message,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, errorCode.getStatus());
     }
 }
