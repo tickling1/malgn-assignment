@@ -50,10 +50,10 @@
 
 ##
 5. 공통 예외 처리 및 응답 구조
-- Global Exception Handler: @RestControllerAdvice를 사용하여 프로젝트 전역에서 발생하는 예외를 공통된 형식으로 응답하도록 구현했습니다.
 <img width="933" height="471" alt="스크린샷 2026-03-07 오후 9 45 35" src="https://github.com/user-attachments/assets/01c22010-e1bb-4f64-a00c-7d0077866e1a" />
 <img width="1512" height="380" alt="image" src="https://github.com/user-attachments/assets/4609a248-2232-47ce-aca5-59b6b329339e" />
 
+- Global Exception Handler: @RestControllerAdvice를 사용하여 프로젝트 전역에서 발생하는 예외를 공통된 형식으로 응답하도록 구현했습니다.
 ##
 ## AI 도구 활용 명시
 AI 활용 범위
