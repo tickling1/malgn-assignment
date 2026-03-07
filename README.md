@@ -31,7 +31,7 @@ gradlew.bat bootRun
 - 관리자(ADMIN) 권한을 가진 사용자는 모든 콘텐츠에 대해 관리 권한(수정,삭제)을 가질 수 있도록 예외 로직을 적용했습니다.
 
 3. 동적 검색 API 분리 (추가 구현 - QueryDSL)
-- 동적 필터링: QueryDSL를 도입하여 제목(Title), 작성자(CreatedBy), 작성 기간(CreatedDate Range) 등 다양한 검색 조건을 유연하게 조합할 수 있도록 구현했습니다.
+- QueryDSL를 도입하여 제목(Title), 작성자(CreatedBy), 작성 기간(CreatedDate Range) 등 다양한 검색 조건을 유연하게 조합할 수 있도록 동적 필터링을 구현했습니다.
 
 4. 계층형 댓글 시스템 (추가 구현)
 - Comments(댓글) 엔티티 내에서 자기 자신을 참조하는 parentComment 필드를 설계하여 무한 계층 구조의 기반을 마련했습니다.
