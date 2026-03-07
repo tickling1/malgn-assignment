@@ -1,8 +1,6 @@
 package com.malgn.service;
 
 import com.malgn.domain.Member;
-import com.malgn.exception.BusinessException;
-import com.malgn.exception.ErrorCode;
 import com.malgn.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
@@ -20,8 +18,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByLoginId(username)
-                .orElseThrow(() -> new BusinessException(ErrorCode.LOGIN_FAILED));
-        //  커스텀 객체로 변환해서 리턴
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 우리가 만든 커스텀 객체로 변환해서 리턴!
         return new CustomUserDetails(member);
     }
 }
