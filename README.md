@@ -21,7 +21,7 @@ cd malgn-assignment
 ./gradlew bootRun
 
 3. 빌드 및 실행 (Windows)
-gradlew.bat bootRun
+./gradlew.bat bootRun
 ```
 
 **3. 접속 정보**
