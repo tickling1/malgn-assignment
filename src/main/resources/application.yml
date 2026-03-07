@@ -21,14 +21,14 @@ spring:
       data-locations: classpath:db/sql/h2-data.sql
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:tcp://localhost/~/dev/2026-cms-api
-    ##url: jdbc:h2:mem:test
+    # url: jdbc:h2:tcp://localhost/~/dev/2026-cms-api
+    url: jdbc:h2:mem:test
     username: sa
     password:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         default_batch_fetch_size: 100
@@ -36,6 +36,13 @@ spring:
     virtual:
       enabled: on
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    url: /v3/api-docs
 
 ## p6spy
 decorator:
@@ -53,3 +60,5 @@ logging:
     root: info
     web: info
     com.malgn: debug
+
+

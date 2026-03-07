@@ -27,7 +27,9 @@ public class MemberService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    // 관리자 가입을 위한 임시 토큰 (실제로는 설정파일 등에서 관리)
+    /** 필독: 현재는 코드 내 상수로 정의되어 있으나,실제 운영 환경에서는 AWS Secrets Manager 또는 Environment Variable을 통해 외부에서 주입받도록 설계해야 합니다.
+     * 과제 제출용 코드에서는 가독성을 위해 서비스 코드 내 상수로 배치하였으며, 해당 값은 'MALGN_ADMIN_SECRET' 으로 설정되어 있습니다."
+     */
     private final String ADMIN_TOKEN = "MALGN_ADMIN_SECRET";
 
     /**

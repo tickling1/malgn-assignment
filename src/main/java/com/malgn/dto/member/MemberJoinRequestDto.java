@@ -1,6 +1,7 @@
 package com.malgn.dto.member;
 
 import com.malgn.domain.Role;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -10,25 +11,33 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@Schema(description = "회원가입 요청 정보")
 public class MemberJoinRequestDto {
 
+    @Schema(description = "로그인 아이디 (4~20자)", example = "user123")
     @NotBlank(message = "아이디는 필수 입력 값입니다.")
     @Size(min = 4, max = 20, message = "아이디는 4~20자 사이여야 합니다.")
     private String loginId;
 
+    @Schema(description = "비밀번호 (8자 이상, 특수문자 권장)", example = "password123!")
     @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     private String password;
 
+    @Schema(description = "사용자 실명", example = "홍길동")
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     private String name;
 
+    @Schema(description = "이메일 주소 (형식 체크)", example = "malgn@example.com")
     @NotBlank(message = "이메일은 필수 입력 값입니다.")
-    @Email(message = "이메일 형식이 올바르지 않습니다.") // 이메일 형식 자동 검증
+    @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String email;
 
-    // --- 권한 관련 필드 추가 ---
-    private Role role; // 기본값은 null로 들어오며, 서비스에서 USER로 처리하거나 선택 가능
-    private String adminToken; // 관리자 가입 시에만 프론트에서 전송}
+    @Schema(description = "회원 권한 (USER: 일반 사용자, ADMIN: 관리자)",
+            example = "USER",
+            allowableValues = {"USER", "ADMIN"})
+    private Role role;
+
+    @Schema(description = "관리자 가입용 시크릿 토큰 (Role이 ADMIN인 경우 필수)", example = "MALGN_ADMIN_SECRET")
+    private String adminToken;
 }
