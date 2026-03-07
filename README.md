@@ -41,6 +41,7 @@ gradlew.bat bootRun
 
 ##
 **2. 보안 및 권한 검증 (기본 요구사항)**
+
 <img width="2176" height="216" alt="image" src="https://github.com/user-attachments/assets/b6b8c937-22fa-4585-a19d-fc1eb7c8c0c6" />
 
 - Spring Security를 활용하여 USER, ADMIN 권한을 구분했습니다.
@@ -48,13 +49,15 @@ gradlew.bat bootRun
 - 관리자(ADMIN) 권한을 가진 사용자는 모든 콘텐츠에 대해 관리 권한(수정,삭제)을 가질 수 있도록 예외 로직을 적용했습니다.
 
 ##
-**3. 동적 검색 API 분리 (추가 구현 - QueryDSL)**
+**3. 동적 검색 API 분리 (추가 구현)**
+
 <img width="1534" height="1188" alt="image" src="https://github.com/user-attachments/assets/5bf6c5ba-713f-418c-83e1-773ab1d29584" />
 
 - QueryDSL를 도입하여 제목(Title), 작성자(CreatedBy), 작성 기간(CreatedDate Range) 등 다양한 검색 조건을 유연하게 조합할 수 있도록 동적 필터링을 구현했습니다.
 
 ##
 **4. 계층형 댓글 시스템 (추가 구현)**
+
 <img width="933" height="1000" alt="image" src="https://github.com/user-attachments/assets/053bdb30-a278-4f35-b127-c336d0cb2bf7" />
 
 - Comments(댓글) 엔티티 내에서 자기 자신을 참조하는 parentComment 필드를 설계하여 무한 계층 구조의 기반을 마련했습니다.
@@ -63,6 +66,7 @@ gradlew.bat bootRun
 
 ##
 **5. 공통 예외 처리 및 응답 구조**
+
 <img width="933" height="471" alt="스크린샷 2026-03-07 오후 9 45 35" src="https://github.com/user-attachments/assets/01c22010-e1bb-4f64-a00c-7d0077866e1a" />
 <img width="1512" height="380" alt="image" src="https://github.com/user-attachments/assets/4609a248-2232-47ce-aca5-59b6b329339e" />
 
