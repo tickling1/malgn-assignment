@@ -1,5 +1,6 @@
 package com.malgn.configure.security;
 
+import com.malgn.exception.ErrorResponse;
 import com.malgn.service.CustomUserDetails;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +13,18 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -27,6 +32,8 @@ import java.util.Optional;
 @EnableWebSecurity
 @EnableJpaAuditing
 public class SecurityConfiguration {
+
+    private final ObjectMapper objectMapper;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -44,27 +51,32 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 👇 로그인과 회원가입 경로는 인증 없이 접근 가능해야 합니다!
                         .requestMatchers("/api/members/join", "/api/members/login").permitAll()
-                        // 나머지 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler(accessDeniedHandler())
                 )
-                // JSON 로그인을 직접 구현했으므로 시큐리티 기본 폼/HTTP 기본 인증은 끔
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
                 .logout(logout -> logout
                         .logoutUrl("/api/members/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(200);
+                            Map<String, Object> logoutResponse = new LinkedHashMap<>();
+                            logoutResponse.put("timestamp", LocalDateTime.now().toString());
+                            logoutResponse.put("status", HttpServletResponse.SC_OK);
+                            logoutResponse.put("message", "로그아웃이 성공적으로 완료되었습니다.");
+
+                            response.setStatus(HttpServletResponse.SC_OK);
                             response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write("{\"message\": \"Logout Success\"}");
+
+                            // ObjectMapper로 객체를 JSON 문자열로 변환
+                            response.getWriter().write(objectMapper.writeValueAsString(logoutResponse));
                         })
                         .invalidateHttpSession(true)
+                        .clearAuthentication(true) // 인증 정보 명시적 삭제
                         .deleteCookies("JSESSIONID")
                 );
 
@@ -100,9 +112,15 @@ public class SecurityConfiguration {
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, authException) -> {
-            response.setContentType("application/json;charset=UTF-8");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"message\": \"로그인이 필요한 서비스입니다.\", \"code\": 401}");
+            ErrorResponse errorResponse = new ErrorResponse(
+                    LocalDateTime.now(),
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    "C004", // 인증 관련 공통 코드 (임의 지정 가능)
+                    "로그인이 필요한 서비스입니다.",
+                    request.getRequestURI()
+            );
+
+            sendError(response, errorResponse);
         };
     }
 
@@ -110,9 +128,22 @@ public class SecurityConfiguration {
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return (request, response, accessDeniedException) -> {
-            response.setContentType("application/json;charset=UTF-8");
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"message\": \"해당 리소스에 접근할 권한이 없습니다.\", \"code\": 403}");
+            ErrorResponse errorResponse = new ErrorResponse(
+                    LocalDateTime.now(),
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "C003", // 권한 관련 공통 코드
+                    "해당 리소스에 접근할 권한이 없습니다.",
+                    request.getRequestURI()
+            );
+
+            sendError(response, errorResponse);
         };
+    }
+
+    // 응답 전송 공통 메서드
+    private void sendError(HttpServletResponse response, ErrorResponse errorResponse) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(errorResponse.status());
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }
