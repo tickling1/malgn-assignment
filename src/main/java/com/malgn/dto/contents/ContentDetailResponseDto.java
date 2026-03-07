@@ -1,14 +1,18 @@
 package com.malgn.dto.contents;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.malgn.domain.Comments;
 import com.malgn.domain.Contents;
 import com.malgn.dto.comments.CommentResponseDto;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@JsonPropertyOrder({ "id", "title", "description", "createdBy", "createdDate", "viewCount", "comments" })
 public class ContentDetailResponseDto {
     private Long id;
     private String title;
@@ -16,20 +20,21 @@ public class ContentDetailResponseDto {
     private String createdBy;
     private Long viewCount;
     private LocalDateTime createdDate;
-    private List<CommentResponseDto> comments; // 계층형 댓글 구조
+    private List<CommentResponseDto> comments; // 계층형 댓글
 
-    public static ContentDetailResponseDto from(Contents entity) {
+    public static ContentDetailResponseDto from(Contents contents) {
         ContentDetailResponseDto dto = new ContentDetailResponseDto();
-        dto.id = entity.getId();
-        dto.title = entity.getTitle();
-        dto.description = entity.getDescription();
-        dto.createdBy = entity.getCreatedBy();
-        dto.viewCount = entity.getViewCount();
-        dto.createdDate = entity.getCreatedDate();
+        dto.id = contents.getId();
+        dto.title = contents.getTitle();
+        dto.description = contents.getDescription();
+        dto.createdBy = contents.getCreatedBy();
+        dto.createdDate = contents.getCreatedDate();
+        dto.viewCount = contents.getViewCount();
 
-        // [핵심] 부모 댓글이 없는(null) 최상위 댓글들만 필터링해서 변환
-        dto.comments = entity.getComments().stream()
-                .filter(comment -> comment.getParentComment() == null) // 부모 없는 놈이 대장
+
+        dto.comments = contents.getComments().stream()
+                .filter(comment -> comment.getParentComment() == null) // 필드명 반영
+                .sorted(Comparator.comparing(Comments::getCreatedDate))
                 .map(CommentResponseDto::from)
                 .collect(Collectors.toList());
 
