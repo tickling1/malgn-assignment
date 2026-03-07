@@ -76,5 +76,5 @@ cd malgn-assignment
 - 사용 도구 - Gemini 
 - Java 25 및 Spring Boot 4 환경에서의 QueryDSL 설정 및 6.x 버전 문법 확인.
 - 계층형 댓글 구조 구현 시 Stream API를 활용한 DTO 변환 및 정렬 로직 참고.
-- SpringDoc (Swagger) API 문서화 중 반복적인 작업에서 활용
+- SpringDoc (Swagger) API 문서화 중 반복적인 작업에서 활용.
 - REST API 응답 시 JSON 필드 순서(@JsonPropertyOrder) 및 빈 값 처리(@JsonInclude) 가이드 참고.
