@@ -127,8 +127,8 @@ public class MemberController {
             )
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto dto, HttpServletRequest request) {
-        LoginResponseDto responseDto = memberService.tryLogin(dto);
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto dto, HttpServletRequest request) {
+        LoginResponseDto responseDto = memberService.tryLogin(dto, request);
 
         // 세션 동기화
         HttpSession session = request.getSession(true);

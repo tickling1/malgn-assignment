@@ -74,7 +74,6 @@ public class CommentsService {
         boolean isAdmin = user.getAuthorities().stream()
                 .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
 
-        // Objects.equals를 사용하여 authorName이 null인 경우에도 안전하게 비교
         if (!isAdmin && !Objects.equals(authorName, user.getName())) {
             throw new BusinessException(ErrorCode.NOT_AUTHOR);
         }

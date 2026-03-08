@@ -1,4 +1,4 @@
-package com.malgn.configure;
+package com.malgn.configure.querydsl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

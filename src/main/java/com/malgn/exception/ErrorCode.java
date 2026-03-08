@@ -10,6 +10,7 @@ public enum ErrorCode {
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "C002", "해당 리소스를 찾을 수 없습니다."),
     API_NOT_FOUND(HttpStatus.NOT_FOUND, "C003", "존재하지 않는 API 경로입니다."),
     HANDLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "C004", "접근 권한이 없습니다."),
+    MISSING_REQUEST_BODY(HttpStatus.BAD_REQUEST, "C005", "요청 본문(Body)이 누락되었거나 형식이 올바르지 않습니다."),
 
     // 회원
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "M001", "이미 사용 중인 아이디입니다."),

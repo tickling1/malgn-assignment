@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -124,9 +125,9 @@ public class ContentsController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable Long id,
-            @RequestBody ContentRequestDto dto,
+            @Valid @RequestBody ContentRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        contentsService.updateContent(id, dto, userDetails.getName(), userDetails.getAuthorities());
+        contentsService.updateContent(id, dto, userDetails.getId(), userDetails.getAuthorities());
         return ResponseEntity.ok().build();
     }
 
@@ -162,7 +163,7 @@ public class ContentsController {
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        contentsService.deleteContent(id, userDetails.getName(), userDetails.getAuthorities());
+        contentsService.deleteContent(id, userDetails.getId(), userDetails.getAuthorities());
         return ResponseEntity.noContent().build();
     }
 }

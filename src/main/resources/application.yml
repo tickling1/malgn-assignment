@@ -1,6 +1,10 @@
 ## server
 server:
   port: 8080
+  servlet:
+    session:
+      cookie:
+        name: SESSION
 
 ## spring
 spring:
@@ -14,21 +18,28 @@ spring:
   h2:
     console:
       enabled: on
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always # 애플리케이션 시작 시 세션 테이블 자동 생성
+      platform: h2
+    timeout: 1800 # 세션 만료 시간 (단위: 초, 30분)
+
   sql:
     init:
-      mode: embedded
+      mode: always
       schema-locations: classpath:db/sql/h2-schema.sql
       data-locations: classpath:db/sql/h2-data.sql
   datasource:
     driver-class-name: org.h2.Driver
-    # url: jdbc:h2:tcp://localhost/~/dev/2026-cms-api
-    url: jdbc:h2:mem:test
+    url: jdbc:h2:mem:testdb;
     username: sa
     password:
+
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         default_batch_fetch_size: 100
@@ -61,4 +72,8 @@ logging:
     web: info
     com.malgn: debug
 
+## 관리자 가입 코드 - 실제 운영 시에는 환경 변수나 aws secret manager를 사용해주세요
+malgn:
+  admin:
+    secret: "MALGN_ADMIN_SECRET"
 

@@ -51,15 +51,16 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/members/join", "/api/members/login").permitAll()
+                        .requestMatchers("/api/members/join/**", "/api/members/login/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/h2-console/**","/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler(accessDeniedHandler())
                 )
+                .requestCache(cache -> cache.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
@@ -73,34 +74,29 @@ public class SecurityConfiguration {
 
                             response.setStatus(HttpServletResponse.SC_OK);
                             response.setContentType("application/json;charset=UTF-8");
-
-                            // ObjectMapper로 객체를 JSON 문자열로 변환
                             response.getWriter().write(objectMapper.writeValueAsString(logoutResponse));
                         })
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true) // 인증 정보 명시적 삭제
-                        .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true) // 서버 측 세션 무효화 (DB 데이터 삭제 유도)
+                        .clearAuthentication(true)   // 인증 정보 삭제
+                        .deleteCookies("JSESSIONID", "SESSION")
                 );
 
         return http.build();
     }
 
     /**
-     * JPA Auditing (@CreatedBy)을 위한 빈 등록
-     * 이 설정이 있어야 엔티티의 createdBy 필드에 값이 자동으로 채워집니다.
+     * JPA Auditing (@CreatedBy, @LastModifiedBy)을 위한 빈 등록
      */
     @Bean
     public AuditorAware<String> auditorProvider() {
         return () -> {
-            // 1. 현재 보안 컨텍스트에서 인증 정보를 가져옵니다.
+            // 현재 보안 컨텍스트에서 인증 정보를 가져옵니다.
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-            // 2. 인증 정보가 없거나, 인증되지 않았거나, 익명 사용자인 경우 "SYSTEM" 반환
             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
                 return Optional.of("SYSTEM");
             }
 
-            // 3. CustomUserDetails를 사용 중이라면 저장된 실제 이름을 꺼내옵니다.
             if (auth.getPrincipal() instanceof CustomUserDetails) {
                 return Optional.of(((CustomUserDetails) auth.getPrincipal()).getName());
             }
@@ -117,7 +113,7 @@ public class SecurityConfiguration {
             ErrorResponse errorResponse = new ErrorResponse(
                     LocalDateTime.now(),
                     HttpServletResponse.SC_UNAUTHORIZED,
-                    "C004", // 인증 관련 공통 코드 (임의 지정 가능)
+                    "C004",
                     "로그인이 필요한 서비스입니다.",
                     request.getRequestURI()
             );

@@ -3,6 +3,7 @@ package com.malgn.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,17 +20,30 @@ public class GlobalExceptionHandler {
         return createErrorResponse(errorCode, e.getMessage(), request);
     }
 
-    // [404] 존재하지 않는 API 경로 (NoHandlerFoundException)
+    /**
+     *  [404] 존재하지 않는 API 경로 (NoHandlerFoundException)
+     */
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoHandlerFound(NoHandlerFoundException e, HttpServletRequest request) {
         return createErrorResponse(ErrorCode.API_NOT_FOUND, ErrorCode.API_NOT_FOUND.getMessage(), request);
     }
 
-    // [400] @Valid 검증 실패는 스프링 자체 예외라 따로 관리
+    /**
+     * [400] @Valid 검증 실패는 스프링 자체 예외라 따로 관리
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e, HttpServletRequest request) {
         String message = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return createErrorResponse(ErrorCode.INVALID_INPUT_VALUE, message, request);
+    }
+
+    /**
+     * [400] HTTP Body가 없거나 JSON 파싱에 실패했을 때 (예: {} 조차 안 보냈을 때)
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
+        // 클라이언트에게는 정의한 ErrorCode 정보를 내려줍니다.
+        return createErrorResponse(ErrorCode.MISSING_REQUEST_BODY, ErrorCode.MISSING_REQUEST_BODY.getMessage(), request);
     }
 
     // 공통 응답 생성 메서드
