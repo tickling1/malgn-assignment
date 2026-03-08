@@ -51,13 +51,15 @@ CREATE TABLE IF NOT EXISTS contents (
 
 -- 댓글 테이블
 CREATE TABLE IF NOT EXISTS comments (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    content VARCHAR(255),
+                                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                        content VARCHAR(255),
     content_id BIGINT,
+    member_id BIGINT, -- [추가] 작성자 ID 컬럼
     parent_id BIGINT,
     created_by VARCHAR(50) NOT NULL,
     created_date TIMESTAMP,
     last_modified_date TIMESTAMP,
     CONSTRAINT fk_comments_content FOREIGN KEY (content_id) REFERENCES contents(id),
+    CONSTRAINT fk_comments_member FOREIGN KEY (member_id) REFERENCES members(id), -- [추가] 작성자 FK
     CONSTRAINT fk_comments_parent FOREIGN KEY (parent_id) REFERENCES comments(id)
     );
