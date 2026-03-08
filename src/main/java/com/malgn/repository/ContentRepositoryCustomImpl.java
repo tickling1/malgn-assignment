@@ -26,7 +26,7 @@ public class ContentRepositoryCustomImpl implements ContentRepositoryCustom {
 
     @Override
     public Page<ContentResponseDto> searchContents(ContentSearchCondition condition, Pageable pageable) {
-        // 1. 데이터 조회 쿼리 (DTO 생성자 파라미터 순서와 100% 일치해야 함)
+        // 1. 데이터 조회 쿼리
         List<ContentResponseDto> contentList = queryFactory
                 .select(new QContentResponseDto(
                         contents.id,
@@ -48,7 +48,7 @@ public class ContentRepositoryCustomImpl implements ContentRepositoryCustom {
                 .orderBy(contents.createdDate.desc()) // 최신 등록순 정렬
                 .fetch();
 
-        // 2. Count 쿼리 (기존과 동일하지만 가독성을 위해 최적화)
+        // 2. Count 쿼리
         JPAQuery<Long> countQuery = queryFactory
                 .select(contents.count())
                 .from(contents)
@@ -58,7 +58,7 @@ public class ContentRepositoryCustomImpl implements ContentRepositoryCustom {
                         dateBetween(condition.getStartDate(), condition.getEndDate())
                 );
 
-        // PageableExecutionUtils는 페이지 수가 모자라거나 마지막 페이지일 때 count 쿼리를 생략해주는 최적화를 지원합니다.
+        // 페이지 수가 모자라거나 마지막 페이지일 때 count 쿼리를 생략해주는 최적화
         return PageableExecutionUtils.getPage(contentList, pageable, countQuery::fetchOne);
     }
 
