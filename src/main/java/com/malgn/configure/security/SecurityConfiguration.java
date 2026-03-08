@@ -40,7 +40,9 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    // AuthenticationManager를 사용하기 위한 설정
+    /**
+     *  AuthenticationManager를설정
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
@@ -106,7 +108,9 @@ public class SecurityConfiguration {
         };
     }
 
-    // 1. 401 Unauthorized (인증 안됨)
+    /**
+     *  401 Unauthorized (인증 안됨)
+     */
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, authException) -> {
@@ -122,7 +126,9 @@ public class SecurityConfiguration {
         };
     }
 
-    // 2. 403 Forbidden (권한 없음)
+    /**
+     *  403 Forbidden (권한 없음)
+     */
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return (request, response, accessDeniedException) -> {
@@ -138,7 +144,9 @@ public class SecurityConfiguration {
         };
     }
 
-    // 응답 전송 공통 메서드
+    /**
+     *   응답 전송 공통 메서드
+      */
     private void sendError(HttpServletResponse response, ErrorResponse errorResponse) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(errorResponse.status());

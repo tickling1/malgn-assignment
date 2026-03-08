@@ -21,7 +21,7 @@ spring:
   session:
     store-type: jdbc
     jdbc:
-      initialize-schema: always # 애플리케이션 시작 시 세션 테이블 자동 생성
+      initialize-schema: always
       platform: h2
     timeout: 1800 # 세션 만료 시간 (단위: 초, 30분)
 
