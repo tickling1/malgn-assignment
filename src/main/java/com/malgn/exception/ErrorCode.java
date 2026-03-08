@@ -20,7 +20,9 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M005", "존재하지 않는 회원입니다."),
 
     // 게시글/댓글
-    NOT_AUTHOR(HttpStatus.FORBIDDEN, "B001", "작성자만 수정/삭제할 수 있습니다.");
+    NOT_AUTHOR(HttpStatus.FORBIDDEN, "B001", "작성자만 수정/삭제할 수 있습니다."),
+    OVER_COMMENT_DEPTH(HttpStatus.BAD_REQUEST, "B002", "더 이상 대댓글을 달 수 없습니다."),
+    COMMENT_CONTENT_MISMATCH(HttpStatus.BAD_REQUEST, "B003", "부모 댓글과 게시글 정보가 일치하지 않습니다.");
 
     private final HttpStatus status;
     private final String code;

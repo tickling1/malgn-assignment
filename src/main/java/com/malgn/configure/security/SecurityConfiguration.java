@@ -1,7 +1,6 @@
 package com.malgn.configure.security;
 
 import com.malgn.exception.ErrorResponse;
-import com.malgn.service.CustomUserDetails;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 

@@ -1,5 +1,6 @@
 package com.malgn.service;
 
+import com.malgn.configure.security.CustomUserDetails;
 import com.malgn.domain.Member;
 import com.malgn.domain.Role;
 import com.malgn.dto.login.LoginRequestDto;

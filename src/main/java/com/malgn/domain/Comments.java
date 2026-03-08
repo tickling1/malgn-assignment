@@ -29,6 +29,10 @@ public class Comments extends BaseTimeEntity{
     private String createdBy; // 생성자 (로그인 ID 자동 저장)
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member; // 작성자 객체 직접 참조
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id")
     private Contents parentContent; // 어느 게시글의 댓글인가
 
@@ -40,10 +44,11 @@ public class Comments extends BaseTimeEntity{
     private List<Comments> children = new ArrayList<>(); // 내 밑에 달린 대댓글들
 
     @Builder
-    public Comments(String content, Contents parentContent, Comments parentComment) {
+    public Comments(String content, Contents parentContent, Comments parentComment, Member member) {
         this.content = content;
         this.parentContent = parentContent;
         this.parentComment = parentComment;
+        this.member = member;
     }
 
     public void update(String content) {

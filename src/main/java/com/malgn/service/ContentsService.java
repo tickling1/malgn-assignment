@@ -1,5 +1,6 @@
 package com.malgn.service;
 
+import com.malgn.configure.security.CustomUserDetails;
 import com.malgn.domain.Contents;
 import com.malgn.domain.Member;
 import com.malgn.dto.contents.ContentDetailResponseDto;
@@ -13,13 +14,9 @@ import com.malgn.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.Objects;
 
 @Service
@@ -31,17 +28,13 @@ public class ContentsService {
 
     /**
      * 1. 콘텐츠 추가
+     * getReferenceById를 사용하여 불필요한 Member Select 쿼리를 방지합니다.
      */
     @Transactional
-    public Long createContent(ContentRequestDto dto) {
-        // 1. 현재 Spring Security Context에서 로그인한 유저의 ID(loginId) 추출
-        String currentLoginId = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+    public Long createContent(ContentRequestDto dto, CustomUserDetails user) {
+        // 인증 객체에서 ID를 추출하여 프록시 객체 생성 (Insert 성능 최적화)
+        Member author = memberRepository.getReferenceById(user.getId());
 
-        // 2. DB에서 해당 멤버 엔티티 조회
-        Member author = memberRepository.findByLoginId(currentLoginId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-
-        // 3. 작성자 정보를 포함하여 콘텐츠 빌드
         Contents content = Contents.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
@@ -54,31 +47,27 @@ public class ContentsService {
     /**
      * 2. 콘텐츠 목록 전체 조회 - 페이징
      */
-    @Transactional(readOnly = true)
     public Page<ContentResponseDto> getContentsList(Pageable pageable) {
-        // 검색 조건 없이 단순히 전체 목록을 페이징하여 반환
         return contentsRepository.findAll(pageable)
                 .map(ContentResponseDto::from);
     }
 
     /**
-     * 3. 콘텐츠 목록 조회 및 동적 검색 (QueryDSL 적용)
+     * 3. 동적 검색 (QueryDSL)
      */
-    @Transactional(readOnly = true)
     public Page<ContentResponseDto> getContentsListWithCond(ContentSearchCondition condition, Pageable pageable) {
         return contentsRepository.searchContents(condition, pageable);
     }
 
     /**
-     * 4. 콘텐츠 상세 조회
-     * 증가 값이 있으므로 readOnly 건들지 말 것
+     * 4. 콘텐츠 상세 조회 (조회수 증가 포함)
      */
     @Transactional
     public ContentDetailResponseDto getContentDetail(Long id) {
         Contents content = contentsRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        content.incrementViewCount();
+        content.incrementViewCount(); // 변경 감지(Dirty Check) 작동
         return ContentDetailResponseDto.from(content);
     }
 
@@ -86,11 +75,11 @@ public class ContentsService {
      * 5. 콘텐츠 수정
      */
     @Transactional
-    public void updateContent(Long id, ContentRequestDto dto, Long currentMemberId, Collection<? extends GrantedAuthority> authorities) {
+    public void updateContent(Long id, ContentRequestDto dto, CustomUserDetails user) {
         Contents content = contentsRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        validateAuthorOrAdmin(content.getAuthor().getId(), currentMemberId, authorities);
+        validateAuthorOrAdmin(content.getAuthor().getId(), user);
 
         content.update(dto.getTitle(), dto.getDescription());
     }
@@ -99,31 +88,23 @@ public class ContentsService {
      * 6. 콘텐츠 삭제
      */
     @Transactional
-    public void deleteContent(Long id, Long currentMemberId, Collection<? extends GrantedAuthority> authorities) {
+    public void deleteContent(Long id, CustomUserDetails user) {
         Contents content = contentsRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        validateAuthorOrAdmin(content.getAuthor().getId(), currentMemberId, authorities);
+        validateAuthorOrAdmin(content.getAuthor().getId(), user);
 
         contentsRepository.delete(content);
     }
 
-
     /**
-     * 권한 검증 공통 메서드
-     * @param authorId 콘텐츠 작성자의 PK (Long)
-     * @param currentMemberId 현재 로그인한 사용자의 PK (Long)
-     * @param authorities 현재 로그인한 사용자의 권한 목록
+     * 권한 검증 공통 메서드 (CustomUserDetails 통합)
      */
-    @Transactional(readOnly = true)
-    public void validateAuthorOrAdmin(Long authorId, Long currentMemberId, Collection<? extends GrantedAuthority> authorities) {
-
-        // 1. 관리자 여부 확인 (ROLE_ prefix 주의)
-        boolean isAdmin = authorities.stream()
+    private void validateAuthorOrAdmin(Long authorId, CustomUserDetails user) {
+        boolean isAdmin = user.getAuthorities().stream()
                 .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
 
-        // 2. 관리자가 아니면서, 작성자 PK와 로그인 유저 PK가 다르면 예외 발생
-        if (!isAdmin && !Objects.equals(authorId, currentMemberId)) {
+        if (!isAdmin && !Objects.equals(authorId, user.getId())) {
             throw new BusinessException(ErrorCode.NOT_AUTHOR);
         }
     }

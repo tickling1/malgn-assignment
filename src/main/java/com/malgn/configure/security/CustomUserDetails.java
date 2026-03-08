@@ -1,7 +1,6 @@
-package com.malgn.service;
+package com.malgn.configure.security;
 
 import com.malgn.domain.Member;
-import com.malgn.domain.Role;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

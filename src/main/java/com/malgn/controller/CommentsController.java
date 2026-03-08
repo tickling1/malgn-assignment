@@ -3,7 +3,7 @@ package com.malgn.controller;
 import com.malgn.dto.comments.CommentRequestDto;
 import com.malgn.exception.ErrorResponse;
 import com.malgn.service.CommentsService;
-import com.malgn.service.CustomUserDetails;
+import com.malgn.configure.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -57,9 +57,10 @@ public class CommentsController {
     @PostMapping("/contents/{contentId}/comments")
     public ResponseEntity<Long> create(
             @Parameter(description = "대상 게시글 ID", example = "10") @PathVariable Long contentId,
-            @RequestBody CommentRequestDto dto) {
+            @RequestBody CommentRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         dto.setContentId(contentId);
-        Long commentId = commentsService.createComment(dto);
+        Long commentId = commentsService.createComment(dto, userDetails);
         return ResponseEntity.ok(commentId);
     }
 
