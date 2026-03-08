@@ -145,7 +145,7 @@ start build/reports/jacoco/test/html/index.html
 <img width="1910" height="258" alt="image" src="https://github.com/user-attachments/assets/099f193e-cc46-4f5f-9f0d-4e670647d0ad" />
 
 - JUnit5와 Mockito를 활용하여 외부 인프라(DB, Security)에 의존하지 않는 독립적인 테스트 환경을 구축하고, 비즈니스 로직의 순수성을 검증했습니다.
-- ReflectionTestUtils를 통해 데이터베이스 없이도 실제 DB에 저장된 것처럼 ID를 가짜로 부여해서 테스트를 진행했고, 글과 댓글이 서로 엉뚱하게 연결되지 않았는지 검증했습니다.
+- ReflectionTestUtils를 통해 데이터베이스 없이도 실제 DB에 저장된 것처럼 ID를 가짜로 부여해서 테스트를 진행하였고, 글과 댓글이 서로 엉뚱하게 연결되지 않았는지 검증했습니다.
 - 서비스 레이어 리팩토링 시 기존 테스트를 통해 회귀 테스트를 수행함으로써 코드 변경에 따른 부작용을 사전에 차단했습니다.
 - 커버리지 도구인 JaCoCo 기반으로 비즈니스 로직이 집중된 서비스 레이어를 대상으로 분석을 수행해봤습니다.
 ---
