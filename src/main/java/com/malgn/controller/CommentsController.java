@@ -25,7 +25,7 @@ public class CommentsController {
 
     private final CommentsService commentsService;
 
-    @Operation(summary = "댓글 및 대댓글 등록", description = "특정 게시글에 댓글을 등록합니다. parentId가 있으면 대댓글로 저장됩니다.")
+    @Operation(summary = "댓글 작성", description = "댓글 및 대댓글을 통합 등록합니다. 대댓글 작성 시 상위 댓글의 ID(parentId)를 json에 포함하세요.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "등록 성공 (생성된 댓글 ID 반환)",
                     content = @Content(schema = @Schema(implementation = Long.class), examples = @ExampleObject(value = "5"))),
