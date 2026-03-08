@@ -9,6 +9,7 @@
 - Gradle 8.x 이상
 - H2 Database (별도 설치 불필요, In-memory 사용)
 
+<br>
 
 **2. 프로젝트 빌드 및 실행**
 
@@ -24,7 +25,7 @@ cd malgn-assignment
 3. 빌드 및 실행 (Windows)
 ./gradlew.bat bootRun
 ```
-
+<br>
 
 **3. 접속 정보**
 
@@ -35,6 +36,7 @@ cd malgn-assignment
 - User Name: sa
 - Password: (비어있음)
 
+<br>
 
 **4. 초기 데이터**
 
