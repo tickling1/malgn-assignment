@@ -6,7 +6,7 @@ import com.malgn.dto.contents.ContentResponseDto;
 import com.malgn.dto.contents.ContentSearchCondition;
 import com.malgn.exception.ErrorResponse;
 import com.malgn.service.ContentsService;
-import com.malgn.service.CustomUserDetails;
+import com.malgn.configure.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -90,8 +90,10 @@ public class ContentsController {
                                     """)))
     })
     @PostMapping
-    public ResponseEntity<Long> create(@RequestBody ContentRequestDto dto) {
-        return ResponseEntity.ok(contentsService.createContent(dto));
+    public ResponseEntity<Long> create(
+            @RequestBody ContentRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(contentsService.createContent(dto, userDetails));
     }
 
     @Operation(summary = "콘텐츠 수정", description = "작성자 본인 또는 관리자만 수정 가능합니다.")
@@ -127,7 +129,7 @@ public class ContentsController {
             @PathVariable Long id,
             @Valid @RequestBody ContentRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        contentsService.updateContent(id, dto, userDetails.getId(), userDetails.getAuthorities());
+        contentsService.updateContent(id, dto, userDetails);
         return ResponseEntity.ok().build();
     }
 
@@ -163,7 +165,7 @@ public class ContentsController {
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        contentsService.deleteContent(id, userDetails.getId(), userDetails.getAuthorities());
+        contentsService.deleteContent(id, userDetails);
         return ResponseEntity.noContent().build();
     }
 }

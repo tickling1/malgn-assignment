@@ -1,11 +1,10 @@
-package com.malgn.service;
+package com.malgn.configure.security;
 
 import com.malgn.domain.Member;
 import com.malgn.exception.BusinessException;
 import com.malgn.exception.ErrorCode;
 import com.malgn.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
