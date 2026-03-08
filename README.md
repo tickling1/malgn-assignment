@@ -9,6 +9,7 @@
 - Gradle 8.x 이상
 - H2 Database (별도 설치 불필요, In-memory 사용)
 
+
 **2. 프로젝트 빌드 및 실행**
 
 터미널(또는 CMD)에서 프로젝트 루트 디렉토리로 이동한 후 아래 명령어를 입력합니다.
@@ -24,6 +25,7 @@ cd malgn-assignment
 ./gradlew.bat bootRun
 ```
 
+
 **3. 접속 정보**
 
 애플리케이션 실행 후, 브라우저 주소창에 아래 주소를 입력하여 접속합니다.
@@ -32,6 +34,7 @@ cd malgn-assignment
 - JDBC URL: jdbc:h2:mem:testdb
 - User Name: sa
 - Password: (비어있음)
+
 
 **4. 초기 데이터**
 
@@ -45,18 +48,18 @@ cd malgn-assignment
 
 ##
 ### 구현 내용 및 추가 구현 기능
-**1. 콘텐츠 관리 및 권한 제어 (기본 요구사항)**
-- Contents CRUD: JPA를 활용하여 게시글의 생성, 수정, 삭제, 상세 조회를 구현했습니다.
-- 목록 조회 시 Pageable 객체를 사용하여 페이징 처리를 수행했습니다.
-
-##
-**2. 보안 및 권한 검증 (기본 요구사항)**
+**1. 보안 및 권한 검증 (기본 요구사항)**
 
 <img width="2176" height="216" alt="image" src="https://github.com/user-attachments/assets/b6b8c937-22fa-4585-a19d-fc1eb7c8c0c6" />
 
 - Spring Security를 활용하여 USER, ADMIN 권한을 구분했습니다.
 - 콘텐츠 수정 및 삭제 시, 작성자 본인 여부를 검증하는 로직을 서비스 레이어에 구현했습니다.
 - 관리자(ADMIN) 권한을 가진 사용자는 모든 콘텐츠에 대해 관리 권한(수정,삭제)을 가질 수 있도록 예외 로직을 적용했습니다.
+
+##
+**2. 콘텐츠 관리 및 권한 제어 (기본 요구사항)**
+- Contents CRUD: JPA를 활용하여 게시글의 생성, 수정, 삭제, 상세 조회를 구현했습니다.
+- 목록 조회 시 Pageable 객체를 사용하여 페이징 처리를 수행했습니다.
 
 ##
 **3. 동적 검색 API 분리 (추가 구현)**
