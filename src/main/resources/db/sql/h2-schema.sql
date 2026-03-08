@@ -1,9 +1,63 @@
--- TODO schema
--- example
-create table members
-(
-    id                 bigint primary key      not null auto_increment,
-    name               varchar(50)             not null,
-    created_date       timestamp default now() not null,
-    last_modified_date timestamp
-);
+-- 1. Spring Session JDBC 테이블 (Spring Session 관리용)
+CREATE TABLE IF NOT EXISTS spring_session (
+    PRIMARY_ID CHAR(36) NOT NULL,
+    SESSION_ID CHAR(36) NOT NULL,
+    CREATION_TIME BIGINT NOT NULL,
+    LAST_ACCESS_TIME BIGINT NOT NULL,
+    MAX_INACTIVE_INTERVAL INT NOT NULL,
+    EXPIRY_TIME BIGINT NOT NULL,
+    PRINCIPAL_NAME VARCHAR(100),
+    CONSTRAINT SPRING_SESSION_PK PRIMARY KEY (PRIMARY_ID)
+    );
+
+CREATE UNIQUE INDEX IF NOT EXISTS SPRING_SESSION_IX1 ON SPRING_SESSION (SESSION_ID);
+CREATE INDEX IF NOT EXISTS SPRING_SESSION_IX2 ON SPRING_SESSION (EXPIRY_TIME);
+CREATE INDEX IF NOT EXISTS SPRING_SESSION_IX3 ON SPRING_SESSION (PRINCIPAL_NAME);
+
+CREATE TABLE IF NOT EXISTS spring_session_attributes (
+    SESSION_PRIMARY_ID CHAR(36) NOT NULL,
+    ATTRIBUTE_NAME VARCHAR(200) NOT NULL,
+    ATTRIBUTE_BYTES LONGVARBINARY NOT NULL,
+    CONSTRAINT SPRING_SESSION_ATTRIBUTES_PK PRIMARY KEY (SESSION_PRIMARY_ID, ATTRIBUTE_NAME),
+    CONSTRAINT SPRING_SESSION_ATTRIBUTES_FK FOREIGN KEY (SESSION_PRIMARY_ID) REFERENCES SPRING_SESSION(PRIMARY_ID) ON DELETE CASCADE
+    );
+
+-- 2. 비즈니스 테이블 (엔티티 기반)
+-- 회원 테이블
+CREATE TABLE IF NOT EXISTS members (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    login_id VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    role VARCHAR(20) NOT NULL, -- ADMIN, USER (Enum)
+    created_date TIMESTAMP,
+    last_modified_date TIMESTAMP
+    );
+
+-- 게시글 테이블
+CREATE TABLE IF NOT EXISTS contents (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description CLOB,
+    view_count BIGINT DEFAULT 0,
+    member_id BIGINT,
+    created_by VARCHAR(50) NOT NULL,
+    last_modified_by VARCHAR(50),
+    created_date TIMESTAMP,
+    last_modified_date TIMESTAMP,
+    CONSTRAINT fk_contents_member FOREIGN KEY (member_id) REFERENCES members(id)
+    );
+
+-- 댓글 테이블
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    content VARCHAR(255),
+    content_id BIGINT,
+    parent_id BIGINT,
+    created_by VARCHAR(50) NOT NULL,
+    created_date TIMESTAMP,
+    last_modified_date TIMESTAMP,
+    CONSTRAINT fk_comments_content FOREIGN KEY (content_id) REFERENCES contents(id),
+    CONSTRAINT fk_comments_parent FOREIGN KEY (parent_id) REFERENCES comments(id)
+    );

@@ -26,14 +26,16 @@ public class ContentRepositoryCustomImpl implements ContentRepositoryCustom {
 
     @Override
     public Page<ContentResponseDto> searchContents(ContentSearchCondition condition, Pageable pageable) {
-        //  데이터 조회 쿼리
+        // 1. 데이터 조회 쿼리 (DTO 생성자 파라미터 순서와 100% 일치해야 함)
         List<ContentResponseDto> contentList = queryFactory
                 .select(new QContentResponseDto(
                         contents.id,
                         contents.title,
                         contents.createdBy,
+                        contents.lastModifiedBy,
                         contents.viewCount,
-                        contents.createdDate
+                        contents.createdDate,
+                        contents.lastModifiedDate
                 ))
                 .from(contents)
                 .where(
@@ -41,12 +43,12 @@ public class ContentRepositoryCustomImpl implements ContentRepositoryCustom {
                         usernameContains(condition.getUsername()),
                         dateBetween(condition.getStartDate(), condition.getEndDate())
                 )
-                .offset(pageable.getOffset())   // 시작 지점
-                .limit(pageable.getPageSize())  // 페이지 사이즈
-                .orderBy(contents.id.desc())    // 최신순 정렬
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(contents.createdDate.desc()) // 최신 등록순 정렬
                 .fetch();
 
-        // Count 쿼리
+        // 2. Count 쿼리 (기존과 동일하지만 가독성을 위해 최적화)
         JPAQuery<Long> countQuery = queryFactory
                 .select(contents.count())
                 .from(contents)
@@ -56,6 +58,7 @@ public class ContentRepositoryCustomImpl implements ContentRepositoryCustom {
                         dateBetween(condition.getStartDate(), condition.getEndDate())
                 );
 
+        // PageableExecutionUtils는 페이지 수가 모자라거나 마지막 페이지일 때 count 쿼리를 생략해주는 최적화를 지원합니다.
         return PageableExecutionUtils.getPage(contentList, pageable, countQuery::fetchOne);
     }
 

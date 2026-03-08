@@ -1,4 +1,4 @@
-package com.malgn.configure;
+package com.malgn.configure.swagger;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

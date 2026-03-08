@@ -15,7 +15,7 @@ public class Member extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 대리키
+    private Long id;
 
     @Column(unique = true, nullable = false, length = 50)
     private String loginId; // 로그인 아이디

@@ -1,6 +1,6 @@
 package com.malgn.domain;
 
-import com.querydsl.core.Fetchable;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,15 +38,23 @@ public class Contents extends BaseTimeEntity {
     @Column(nullable = false, updatable = false, length = 50)
     private String createdBy;
 
-    // 핵심: 게시글에 달린 댓글 리스트 (이게 있어야 getComments()가 작동함)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member author;
+
+    @LastModifiedBy
+    @Column(length = 50)
+    private String lastModifiedBy;
+
     @OneToMany(mappedBy = "parentContent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comments> comments = new ArrayList<>();
 
     @Builder
-    public Contents(String title, String description) {
+    public Contents(String title, String description, Member author) {
         this.title = title;
         this.description = description;
         this.viewCount = 0L;
+        this.author = author;
     }
 
     public void incrementViewCount() { this.viewCount++; }

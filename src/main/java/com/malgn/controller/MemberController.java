@@ -33,8 +33,8 @@ public class MemberController {
 
     /**
      * 회원가입 API
-     * 현재는 코드 내 상수로 정의되어 있으나,실제 운영 환경에서는 AWS Secrets Manager 또는 Environment Variable을 통해 외부에서 주입받도록 설계해야 합니다.
-     * 과제 제출용 코드에서는 가독성을 위해 서비스 코드 내 상수로 배치하였으며, 해당 값은 'MALGN_ADMIN_SECRET' 으로 설정되어 있습니다."
+     * 현재는 ADMIN_TOKEN가 application.yml 파일에서 관리하고 있으며
+     * 운영 환경에서는 외부 환경 변수, aws secret manager를 통해 주입받아야 합니다.
      */
     @Operation(
             summary = "회원가입",
@@ -127,10 +127,9 @@ public class MemberController {
             )
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto dto, HttpServletRequest request) {
-        LoginResponseDto responseDto = memberService.tryLogin(dto);
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto dto, HttpServletRequest request) {
+        LoginResponseDto responseDto = memberService.tryLogin(dto, request);
 
-        // 세션 동기화
         HttpSession session = request.getSession(true);
         session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
         return ResponseEntity.ok(responseDto);
